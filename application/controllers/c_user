@@ -1,0 +1,65 @@
+<?php 
+class c_user extends CI_Controller {
+
+	function __construct() {
+        parent::__construct();
+		$this->load->model('Transaksi_model', 'Transaksi', TRUE);
+		$this->load->model('Master_model', 'Master', TRUE);
+	}
+	public function index()
+	{
+		$this->add_form();
+	}
+	function cek_login()
+	{
+		if(($this->session->userdata('login_sta')!=TRUE) )
+		{
+			redirect();
+		}	
+	}
+	
+	function add_form()
+	{
+		$this->cek_login();	
+		$data['main_view']='c_user'; //html pada view/c_user.php
+		$data['form']=site_url('c_user/add_c_user');	//action pada button simpan
+		$data['form2']=site_url('c_user/edit_c_user');	//action pada button simpan
+		$data['form3']=site_url('c_user/delete_c_user');	//action pada button simpan
+		$data['c_userm']=$this->Master->get_departments()->result();
+		$data['c_userl']=$this->Master->get_departments_parent()->result();
+		$this->load->view('c_user',$data);
+	}
+	function add_c_user()
+	{
+		$this->cek_login();
+		$form=array('c_userNAME' => $this->input->post('c_username'),
+					'SUPc_userID' => $this->input->post('supc_userid'),
+					);
+		$this->Transaksi->add_form($form,'departments');
+		$this->session->set_flashdata('msg_c_user','Data Berhasih ditambahkan');
+
+		redirect('c_user');
+	}
+	function edit_c_user()
+	{
+		$this->cek_login();
+		$form=array('c_userNAME' => $this->input->post('c_username'),
+					'SUPc_userID' => $this->input->post('supc_userid'),
+					);
+		$this->Transaksi->edit_form2($this->input->post('c_userid'),$form,'departments','c_userID');
+		$this->session->set_flashdata('msg_c_user','Data Berhasih diupdate');
+
+		redirect('c_user');
+	}
+	function delete_c_user()
+	{
+		$this->Transaksi->delete_form2($this->input->post('c_userid'),'departments','c_userID');
+		$this->session->set_flashdata('msg_c_user_fail','Data Berhasih dihapus');
+
+		redirect('c_user');
+	}
+	
+}
+
+/* End of file welcome.php */
+/* Location: ./application/controllers/welcome.php */
